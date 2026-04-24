@@ -61,7 +61,7 @@ if (env.isProduction) {
 
     app.use(express.static(frontendDistPath));
 
-    app.all('*', (req, res, next) => {
+    app.use((req, res, next) => {
         if (req.path.startsWith('/api')) {
             return next();
         }
