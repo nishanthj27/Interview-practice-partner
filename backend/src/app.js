@@ -52,26 +52,24 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/api', globalLimiter);
 
-// API routes
 app.use('/api/public', publicRoutes);
 app.use('/api/interviews', requireAuth, interviewRoutes);
 app.use('/api/analytics', requireAuth, analyticsRoutes);
 
-// ✅ Serve frontend in production
 if (env.isProduction) {
     const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
 
-    // Serve static files
     app.use(express.static(frontendDistPath));
 
-    // SPA fallback (VERY IMPORTANT)
-    app.get('*', (req, res, next) => {
-        if (req.path.startsWith('/api')) return next();
-        res.sendFile(path.join(frontendDistPath, 'index.html'));
+    app.all('*', (req, res, next) => {
+        if (req.path.startsWith('/api')) {
+            return next();
+        }
+
+        return res.sendFile(path.join(frontendDistPath, 'index.html'));
     });
 }
 
-// Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 
